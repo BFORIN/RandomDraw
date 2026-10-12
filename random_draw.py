@@ -44,18 +44,25 @@ def is_autostart_enabled():
     return bool(autostart_path and os.path.exists(autostart_path))
 
 
+def autostart_target():
+    """开机自启脚本要拉起的程序路径。
+
+    打包成单文件 exe 后 __file__ 指向临时解压目录，退出即被删除，
+    此时必须直接指向 exe 自身，否则开机自启会静默失效。
+    """
+    if getattr(sys, "frozen", False):
+        return sys.executable
+    return os.path.abspath(__file__)
+
+
 def set_autostart(enabled):
     """写入/删除开机自启脚本，返回是否设置成功。"""
     autostart_path = get_autostart_path()
     if not autostart_path:
         return False
     if enabled:
-        batch_content = (
-            "@echo off\n"
-            f'"{sys.executable}" "{os.path.abspath(__file__)}"\n'
-        )
         with open(autostart_path, "w", encoding="utf-8") as f:
-            f.write(batch_content)
+            f.write(f'@echo off\n"{autostart_target()}"\n')
         return True
     if os.path.exists(autostart_path):
         os.remove(autostart_path)

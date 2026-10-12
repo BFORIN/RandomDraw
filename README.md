@@ -48,33 +48,50 @@ python random_draw.py
 ### 2. 运行测试
 
 ```bash
-python -m unittest test_draw_core
+python -m unittest discover -p "test_*.py"
 ```
 
-### 3. Windows 打包方式（推荐无报毒方案）
+### 3. 打包成 Windows EXE
 
-#### 使用 Nuitka 编译为原生 EXE（大幅降低误报）
+#### 方式一：GitHub Actions（推荐，无需本地 Windows）
 
-```bash
+仓库已配置 `.github/workflows/build-exe.yml`。推送到 `main` 后会自动：
+
+1. 在 Ubuntu 上跑单元测试
+2. 在 Windows runner 上并行打包（PyInstaller 与 Nuitka 各一份）
+3. 产出 `RandomDraw-pyinstaller` 与 `RandomDraw-nuitka` 两个 artifact
+
+在仓库的 **Actions → Build EXE → Artifacts** 下载即可，
+也可以在 Actions 页面点 **Run workflow** 手动触发。
+
+两个版本各有取舍：**Nuitka** 编译为原生代码，杀软误报率明显更低（推荐分发用）；
+**PyInstaller** 产物更小、构建更快。
+
+#### 方式二：本地 Windows 构建
+
+```powershell
+pip install pyinstaller
+pyinstaller --noconfirm --clean --onefile --windowed --name RandomDraw random_draw.py
+```
+
+或用 Nuitka：
+
+```powershell
 pip install nuitka
-python -m nuitka --onefile --windows-disable-console random_draw.py
-```
-
-#### PyInstaller 普通打包
-
-```bash
-pyinstaller -w random_draw.py
+python -m nuitka --standalone --onefile --windows-disable-console --enable-plugin=tk-inter --assume-yes-for-downloads --output-filename=RandomDraw.exe random_draw.py
 ```
 
 ## 📂 项目结构
 
 ```Plain Text
 .
-├── random_draw.py               # 界面层（Tkinter）
-├── draw_core.py                 # 配置解析与抽签核心，不依赖 Tkinter
-├── test_draw_core.py            # 抽签核心单元测试
-├── README.md                    # 项目说明文档
-└── LICENSE                      # 开源协议文件
+├── random_draw.py                    # 界面层（Tkinter）
+├── draw_core.py                      # 配置解析与抽签核心，不依赖 Tkinter
+├── test_draw_core.py                 # 抽签核心单元测试
+├── test_packaging.py                 # 打包相关单元测试（含开机自启路径）
+├── .github/workflows/build-exe.yml   # CI：测试并打包 Windows EXE
+├── README.md                         # 项目说明文档
+└── LICENSE                           # 开源协议文件
 ```
 
 ## 📄 开源协议
@@ -90,7 +107,11 @@ pyinstaller -w random_draw.py
 - 移除重抽触发机制（`reroll_triggers` / `max_rerolls`），抽签恢复为完全等概率
 - 旧配置文件中的重抽字段会在下次加载时自动清除
 - 拆分界面层与抽签核心，消除全局变量
-- 新增抽签核心单元测试，含分布均匀性检验
+- 界面布局调整：内容垂直居中，避免移除模式选择后卡片留大片空白
+- 修复打包成单文件 exe 后开机自启失效的问题（原先指向已删除的临时解压目录）
+- 新增 GitHub Actions 工作流，自动测试并打包 Windows EXE（PyInstaller + Nuitka）
+- 新增配置文件字段表，删除重抽机制说明
+- 测试扩充至 28 项，新增分布均匀性检验、废弃键迁移验证、打包路径验证
 
 ### v1.0
 
