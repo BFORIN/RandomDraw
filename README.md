@@ -3,7 +3,7 @@
 ![License](https://img.shields.io/badge/license-GPL%20v3-blue)
 ![Version](https://img.shields.io/github/v/release/BFORIN/RandomDraw?label=version&color=green)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey)
 
 一款基于 Python + Tkinter 开发的**可视化随机抽签小工具**，界面简洁、逻辑严谨，适用于日常随机抽签、随机点名、随机分配场景。
 
@@ -23,7 +23,7 @@
 
 - 内置关于页面，展示开源协议与项目地址
 
-- 原生 GUI 界面，跨平台可用、无广告、纯轻量
+- 原生 GUI 界面，Windows/Linux 已适配（macOS 基于 Tkinter 跨平台可运行，但**未做专项适配、未实测**）、无广告、纯轻量
 
 - 化学课特供版：长按悬浮窗直接打开，闪现**假启动日志**（Arch systemd 风格 + Windows 日志内容）+ 标题加后缀 + 输入幸运数字（只抽该数字）
 
