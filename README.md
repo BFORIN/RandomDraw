@@ -18,7 +18,7 @@
 
 - 原生 GUI 界面，跨平台可用、无广告、纯轻量
 
-- 化学课特供版：长按悬浮窗直接打开，闪现乱码终端 + 标题加后缀 + 输入幸运数字（只抽该数字）
+- 化学课特供版：长按悬浮窗直接打开，闪现**假启动日志**（Arch systemd 风格 + Windows 日志内容）+ 标题加后缀 + 输入幸运数字（只抽该数字）
 
 - **位图绘制抗锯齿**：Windows 高 DPI 感知 + 悬浮圆球 PIL 超采样渲染，高分屏下文字/圆边不再马赛克、锯齿
 
@@ -98,7 +98,7 @@ python -m unittest discover -p "test_*.py"
 
 ### 3. 打包成 Windows EXE
 
-#### 方式一：GitHub Actions（推荐，无需本地 Windows）
+#### 方式一：GitHub Actions（推荐，无需本地 Windows，可自动发布）
 
 仓库已配置 `.github/workflows/build-exe.yml`。推送到 `main` 后会自动：
 
@@ -106,21 +106,12 @@ python -m unittest discover -p "test_*.py"
 2. 在 Windows runner 上并行打包（PyInstaller 与 Nuitka 各一份）
 3. 产出 `RandomDraw-pyinstaller` 与 `RandomDraw-nuitka` 两个 artifact
 
-在仓库的 **Actions → Build EXE → Artifacts** 下载即可，
-也可以在 Actions 页面点 **Run workflow** 手动触发。
+**打一个 `v*` 标签**（如 `git tag v1.10 && git push origin v1.10`）时，CI 会额外**自动创建 GitHub Release** 并把打包好的 exe 上传到 Release 页面；也可在 Actions 页面点 **Run workflow** 手动触发。
 
 两个版本各有取舍：**Nuitka** 编译为原生代码，杀软误报率明显更低（推荐分发用）；
 **PyInstaller** 产物更小、构建更快。
 
-#### 方式二：本地 Windows 构建
-
-项目根目录的 **`build.bat`** 可**一键完成**：检查 Python/PyInstaller → PyInstaller 打包 → 复制 `config.json` → 分发到 `%USERPROFILE%\Public\`。双击或命令行运行即可：
-
-```bat
-build.bat
-```
-
-手动等价命令：
+#### 方式二：本机手动打包（不依赖版本库脚本）
 
 ```powershell
 pip install pyinstaller
@@ -134,23 +125,9 @@ pip install nuitka
 python -m nuitka --standalone --onefile --windows-disable-console --enable-plugin=tk-inter --assume-yes-for-downloads --output-filename=RandomDraw.exe random_draw.py
 ```
 
-#### 方式三：本地 Linux 一键打包（Wine/Proton，推荐本机开发）
-
-项目根目录提供 `build.sh`，封装了完整的打包 + 分发 + 校验流程：
-
-```bash
-bash build.sh
-```
-
-它会：
-1. 用 **WE-Proton** 调用 Windows Python（`/home/bforin/C`，含 Pillow + PyInstaller）执行 PyInstaller
-2. 分发 `RandomDraw.exe` 到 `~/Public/`
-3. 校验 PE32+ GUI 子系统与 md5 一致性
+> 本机开发用的 `build.sh`（Linux/Wine）与 `build.bat`（Windows）属于**本地构建工具**，写死了本机路径，**未纳入版本库**（已加 `.gitignore`）；需要时可在本地保留使用，但公开构建以 CI 为准。
 
 **`config.json` 不随包复制**——程序首次运行在自身目录自动生成默认配置（含黑名单），无需手动创建。
-
-**wine 前缀**位于 `/home/bforin/.local/share/pfx`（btrfs 分区，支持符号链接、持久化）。
-注意：不要放到 `/tmp`（重启即清空）或 exFAT SD 卡（如 `/home/bforin/SD`，不支持符号链接，wine 前缀无法创建）。
 
 ## 📂 项目结构
 
@@ -160,12 +137,12 @@ bash build.sh
 ├── draw_core.py                      # 配置解析与抽签核心，不依赖 Tkinter
 ├── test_draw_core.py                 # 抽签核心与公平性单元测试
 ├── test_packaging.py                 # 打包相关单元测试（含开机自启路径）
-├── .github/workflows/build-exe.yml   # CI：测试并打包 Windows EXE
-├── build.sh                          # Linux：Wine/Proton 一键打包（分发到 ~/Public）
-├── build.bat                         # Windows：本地 Python/PyInstaller 一键打包
+├── .github/workflows/build-exe.yml   # CI：测试、打包 Windows EXE、打 tag 自动发布 Release
 ├── README.md                         # 项目说明文档
 └── LICENSE                           # 开源协议文件
 ```
+
+> 本地构建脚本 `build.sh`（Linux/Wine）、`build.bat`（Windows）、`RandomDraw.spec`（PyInstaller 配方）写死了本机路径，属于本地开发工具，未纳入版本库（已在 `.gitignore` 忽略）。
 
 ## 📄 开源协议
 
