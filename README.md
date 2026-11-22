@@ -1,5 +1,10 @@
 # 随机抽签器
 
+![License](https://img.shields.io/badge/license-GPL%20v3-blue)
+![Version](https://img.shields.io/github/v/release/BFORIN/RandomDraw?label=version&color=green)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+
 一款基于 Python + Tkinter 开发的**可视化随机抽签小工具**，界面简洁、逻辑严谨，适用于日常随机抽签、随机点名、随机分配场景。
 
 > 📖 **详细使用教程**：[使用说明.md](使用说明.md) — 面向用户的分步操作、配置与常见问题
