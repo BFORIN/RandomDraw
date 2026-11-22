@@ -78,3 +78,20 @@ jobs:
           name: RandomDraw-${{ matrix.builder }}
           path: ${{ matrix.builder == 'pyinstaller' && 'dist/RandomDraw.exe' || 'build-nuitka/RandomDraw.exe' }}
           if-no-files-found: error
+
+  release:
+    name: 发布 GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: 创建/更新 Release 并上传 exe 产物
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*.exe
+          generate_release_notes: true
