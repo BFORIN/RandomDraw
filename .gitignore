@@ -4,5 +4,8 @@ config.json
 build/
 dist/
 .vscode/
+RandomDraw.spec
+build.sh
+build.bat
 
 history.json
